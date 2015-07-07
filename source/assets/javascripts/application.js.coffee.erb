@@ -1,0 +1,101 @@
+//= require_tree .
+//= require bootstrap
+
+class Discographer
+  @API_ROOT: "https://api.spotify.com/v1"
+
+  constructor: (library, token, @market) ->
+    delete library["Compilations"]
+    @library = @serialize(library)
+    @queue = Object.keys(@library)
+    @queueSize = @queue.length
+    @intervalId = null
+    @intervalMs = if token.length >= 1 then 200 else 1000
+    @headers = {}
+    @headers["Authorization"] = "Bearer #{token}" if token.length >= 1
+
+  serialize: (hash) ->
+    serialized = {}
+    for key, arr of hash
+      serialized[@normalize(key)] = arr.map (item) =>
+        @normalize(item)
+    serialized
+
+  normalize: (string) ->
+    string.toLowerCase().replace(/[^a-z\s]/, '').replace(/\s+/, ' ')
+
+  processLocalArtists: =>
+    @updateProgress()
+    if @queue.length >= 1
+      localName = @queue.shift()
+      url = "#{Discographer.API_ROOT}/search/?q=artist:#{encodeURIComponent(localName)}&type=artist&limit=1&market=#{@market}"
+      $ajax = $.ajax
+        url: url,
+        headers: @headers
+      $ajax.done (data) =>
+        artist = data.artists.items[0]
+        if artist != undefined
+          $panel = $("<div class='panel panel-default' id='artist-#{artist.id}' />")
+          $panel.append("<div class='panel-heading'><strong>#{artist.name}<strong></div>")
+          $("#output").append($panel)
+          @getAlbumsForArtist(artist.id, localName)
+    else
+      @stop()
+
+  getAlbumsForArtist: (artist_id, localName) ->
+    url = "#{Discographer.API_ROOT}/artists/#{artist_id}/albums?album_type=album&market=#{@market}"
+    $ajax = $.ajax
+      url: url
+      headers: @headers
+    $ajax.done (data) =>
+      names = []
+      ids = []
+      $.each data.items, (_, album) =>
+        norm = @normalize(album.name)
+        return if album.name.toLowerCase().match(/\((deluxe|special)/) != null
+        return if $.inArray(norm, names) != -1
+        ids.push(album.id)
+        names.push(norm)
+      @getAlbums(ids, artist_id, localName) if ids.length >= 1
+
+  getAlbums: (ids, artist_id, localName) =>
+    url = "#{Discographer.API_ROOT}/albums?ids=#{ids.join(',')}"
+    $ajax = $.ajax
+      url: url,
+      headers: @headers
+    $ajax.done (data) =>
+      $group = $("<ul class='list-group' />")
+      albums = data.albums.sort (a, b) =>
+        @timestamp(a.release_date) - @timestamp(b.release_date)
+      for album in albums
+        match = @library[localName].indexOf(@normalize(album.name)) >= 0
+        $item = $("<a class='list-group-item' href='#{album.uri}' />")
+        $art = $("<img class='pull-right' src='#{album.images[0].url}' height='30' />")
+        $body = $("<p><span class='text-muted'>#{album.release_date.replace(/^(\d{4}).*/, '$1')}:</span> #{album.name}<p>")
+        $item.append($art, $body)
+        $item.addClass("list-group-item-success") if match
+        $group.append($item)
+      $("#artist-#{artist_id}").append($group)
+
+  timestamp: (string) ->
+    (new Date(string)).valueOf()
+
+  start: =>
+    @intervalId = window.setInterval @processLocalArtists, @intervalMs
+    $("#output").html("").addClass("populated")
+
+  stop: ->
+    $(".progress").addClass("done")
+    window.clearInterval(@intervalId)
+
+  updateProgress: ->
+    width = "#{Math.ceil((@queueSize-@queue.length)/@queueSize*100)}%"
+    $(".progress-bar").css("width", width)
+
+  init: ->
+    $("#start-button").click @start
+
+$ ->
+  dirs = <%= JSON.generate(itunes_library) %>
+  discographer = new Discographer(dirs, "<%= spotify_token %>", "<%= spotify_market %>")
+  discographer.init()

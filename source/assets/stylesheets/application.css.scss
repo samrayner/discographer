@@ -1,0 +1,28 @@
+@import "bootstrap";
+
+#output.populated {
+  padding: 2em 0;
+  -webkit-columns: 300px 2;
+     -moz-columns: 300px 2;
+          columns: 300px 2;
+
+  .panel {
+    -webkit-column-break-inside: avoid;
+              page-break-inside: avoid;
+                   break-inside: avoid;
+  }
+}
+
+.progress {
+  -webkit-transition: height 1s;
+  border-radius: 0;
+  height: 10px;
+
+  &.done {
+    height: 0;
+
+    .progress-bar {
+      background-color: $brand-success;
+    }
+  }
+}

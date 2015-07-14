@@ -18,11 +18,12 @@
   border-radius: 0;
   height: 10px;
 
-  &.done {
-    height: 0;
+  &.done .progress-bar {
+    background-color: $brand-success;
+    width: 100% !important;
+  }
 
-    .progress-bar {
-      background-color: $brand-success;
-    }
+  &.collapsed {
+    height: 0;
   }
 }

@@ -1,16 +1,8 @@
+@import "bootstrap-sprockets";
 @import "bootstrap";
 
-#output.populated {
-  padding: 2em 0;
-  -webkit-columns: 300px 2;
-     -moz-columns: 300px 2;
-          columns: 300px 2;
-
-  .panel {
-    -webkit-column-break-inside: avoid;
-              page-break-inside: avoid;
-                   break-inside: avoid;
-  }
+.panel-heading {
+  cursor: pointer;
 }
 
 .progress {

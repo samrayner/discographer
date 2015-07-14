@@ -8,7 +8,6 @@ class App.Main
   @API_ROOT: "https://api.spotify.com/v1"
   market: "US"
   library: {}
-  artists: []
   headers: {}
 
   constructor: (token, @market) ->
@@ -18,30 +17,48 @@ class App.Main
     string.toLowerCase().replace("&", "and").replace(/[^A-zÀ-ÿ\s]/g, "").replace(/\s+/g, " ").trim()
 
   processTrack: (artist, album) =>
-    artist = @normalize(artist)
-    album = @normalize(album)
-    if @library[artist] == undefined
-      @processArtist(@artists[@artists.length-1]) if @artists.length >= 1
-      @artists.push(artist)
-      @library[artist] = [album]
-    else if @library[artist].indexOf(album) == -1
-      @library[artist].push(album)
+    artistNorm = @normalize(artist)
+    albumNorm = @normalize(album)
+    if @library[artistNorm] == undefined
+      @renderArtist(artist, artistNorm)
+      @library[artistNorm] = [albumNorm]
+    else if @library[artistNorm].indexOf(albumNorm) == -1
+      @library[artistNorm].push(albumNorm)
 
-  processArtist: (localName) =>
-    url = "#{App.Main.API_ROOT}/search/?q=artist:#{encodeURIComponent(localName)}&type=artist&limit=1&market=#{@market}"
+  renderArtist: (artist, artistNorm) ->
+    $col = $("<div class='col-sm-6' />")
+    $panel = $("<div class='panel panel-default' data-artist='#{artistNorm}' />")
+    $heading = $("<div class='panel-heading'><strong>#{artist}<strong><span class='glyphicon glyphicon-chevron-down pull-right'></span></div>")
+    $heading.click => @headingClick(artistNorm)
+    $panel.append($heading)
+    $col.append($panel)
+    $("#output").append($col)
+
+  toggleArrow: ($heading) ->
+    $heading.find(".glyphicon").toggleClass("glyphicon-chevron-down glyphicon-chevron-up")
+
+  headingClick: (artist) =>
+    $target = $(event.target)
+    @getArtist(artist)
+    @toggleArrow($target)
+    $target.unbind("click").click =>
+      @toggleArrow($target)
+      $target.parent().find(".list-group").toggleClass("hidden")
+
+  getArtist: (name) =>
+    url = "#{App.Main.API_ROOT}/search/?q=artist:#{encodeURIComponent(name)}&type=artist&limit=1&market=#{@market}"
     $ajax = $.ajax
       url: url,
       headers: @headers
     $ajax.done (data) =>
       artist = data.artists.items[0]
-      if artist != undefined
-        $panel = $("<div class='panel panel-default' id='artist-#{artist.id}' />")
-        $panel.append("<div class='panel-heading'><strong>#{artist.name}<strong></div>")
-        $("#output").append($panel)
-        @getAlbumsForArtist(artist.id, localName)
+      if artist == undefined
+        @renderError(name)
+      else
+        @getAlbumsForArtist(artist.id, name, artist.name)
 
-  getAlbumsForArtist: (artist_id, localName) ->
-    url = "#{App.Main.API_ROOT}/artists/#{artist_id}/albums?album_type=album&market=#{@market}"
+  getAlbumsForArtist: (id, name, apiName) ->
+    url = "#{App.Main.API_ROOT}/artists/#{id}/albums?album_type=album&market=#{@market}"
     $ajax = $.ajax
       url: url
       headers: @headers
@@ -54,34 +71,58 @@ class App.Main
         return if names.indexOf(norm) != -1
         ids.push(album.id)
         names.push(norm)
-      @getAlbums(ids, artist_id, localName) if ids.length >= 1
+      if ids.length == 0
+        @renderAlbums(ids, name, apiName)
+      else
+        @getAlbums(ids, name, apiName) if ids.length >= 1
 
-  getAlbums: (ids, artist_id, localName) =>
+  getAlbums: (ids, artist, apiArtist) =>
     url = "#{App.Main.API_ROOT}/albums?ids=#{ids.join(',')}"
     $ajax = $.ajax
       url: url,
       headers: @headers
     $ajax.done (data) =>
-      $group = $("<ul class='list-group' />")
       albums = data.albums.sort (a, b) =>
         @timestamp(a.release_date) - @timestamp(b.release_date)
-      for album in albums
-        $item = $("<a class='list-group-item' href='#{album.uri}' />")
-        $art = $("<img class='pull-right' src='#{album.images[0].url}' height='30' />")
-        $body = $("<p><span class='text-muted'>#{album.release_date.replace(/^(\d{4}).*/, '$1')}:</span> #{album.name}<p>")
-        $item.append($art, $body)
+      @renderAlbums(albums, artist, apiArtist)
 
-        match = @library[localName].indexOf(@normalize(album.name)) != -1
-        $item.addClass("list-group-item-success") if match
+  renderError: (artist) ->
+    $ul = $("<ul class='list-group' />")
+    $li = $("<li class='list-group-item list-group-item-danger'><span class='glyphicon glyphicon-exclamation-sign'></span> Artist not found on Spotify</li>")
+    $ul.append($li)
+    $(".panel[data-artist='#{artist}']").append($ul)
 
-        $group.append($item)
-      $("#artist-#{artist_id}").append($group)
+  renderAlbums: (albums, artist, apiArtist) ->
+    $group = $("<ul class='list-group' />")
+
+    if albums.length == 0
+      $group.append("<li class='list-group-item list-group-item-danger'><span class='glyphicon glyphicon-exclamation-sign'></span> No albums found on Spotify</li>")
+    else
+      if artist != @normalize(apiArtist)
+        $group.append("<li class='list-group-item list-group-item-warning'><span class='glyphicon glyphicon-info-sign'></span> Closest artist match: #{apiArtist}</li>")
+
+    for album in albums
+      $item = $("<a class='list-group-item' href='#{album.uri}' />")
+      $art = $("<img class='pull-right' src='#{album.images[0].url}' height='30' />")
+
+      year = album.release_date.replace(/^(\d{4}).*/, '$1')
+      $body = $("<p><span class='text-muted'>#{year}</span>: #{album.name}</p>")
+
+      if year == "#{new Date().getFullYear()}"
+        $body.append(" <span class='label label-info'>New</span>")
+
+      $item.append($art, $body)
+      match = @library[artist].indexOf(@normalize(album.name)) != -1
+      $item.addClass("list-group-item-success") if match
+      $group.append($item)
+
+    $(".panel[data-artist='#{artist}']").append($group)
 
   timestamp: (string) ->
     (new Date(string)).valueOf()
 
   start: =>
-    $("#output").html("").addClass("populated")
+    $("#output").html("")
 
   stop: ->
     $(".progress").addClass("done")

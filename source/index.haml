@@ -13,26 +13,32 @@
     = javascript_include_tag "//js.maxmind.com/js/apis/geoip2/v2.1/geoip2.js"
     = javascript_include_tag "application"
   %body
-    #dropzone
+    #landing
       .container
         .row
           .col-xs-12.text-center
-            %h1
-              Discographer
-              .small Discover more albums by the artists you love.
+            %header
+              %h1 Discographer
+              %p Discover more albums by the artists you love.
 
-            %p Drag your iTunes library file here.
+            .drop-ring
+            .drop-icon
+              = image_tag "file.png", alt: "iTunes Library.xml"
 
-            %p
-              You can find it at:
+            %p.instructions
+              %span Drag your iTunes library here from
               %code.lib-path /Users/USERNAME/Music/iTunes/iTunes Library.xml
 
-            .about
-              :markdown
-                Discographer searches the [Spotify API](https://developer.spotify.com/web-api/) for artists in your library and lists their albums.
+      #dropzone
 
-    = link_to "https://github.com/samrayner/discographer", class: "github-ribbon" do
-      = image_tag "https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67", alt: "Fork me on Github"
+      .about
+        :markdown
+          Discographer fetches albums by artists in your library using the [Spotify API](https://developer.spotify.com/web-api/) and highlights the ones you own. Your library is never uploaded or shared.
+
+          Feedback? Tweet [@samrayner](http://twitter.com/samrayner)
+
+      = link_to "https://github.com/samrayner/discographer", class: "github-ribbon" do
+        = image_tag "https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67", alt: "Fork me on Github"
 
     .progress
       .progress-bar#progress

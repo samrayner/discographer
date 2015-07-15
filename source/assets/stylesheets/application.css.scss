@@ -11,9 +11,16 @@
 }
 
 .progress {
-  -webkit-transition: height 1s;
   border-radius: 0;
   height: 10px;
+
+  -webkit-transition: height 1s;
+  -moz-transition:    height 1s;
+  transition:         height 1s;
+
+  .progress-bar {
+    background-color: $brand-info;
+  }
 
   &.done .progress-bar {
     background-color: $brand-success;
@@ -25,33 +32,124 @@
   }
 }
 
+#output {
+  padding: 40px;
+}
+
+.list-group-item-success {
+  text-decoration: line-through;
+}
+
+.album-year {
+  color: rgba(0,0,0,0.5);
+}
+
 .github-ribbon {
   position: absolute;
   top: 0;
   right: 0;
   z-index: 99;
-  display: none;
 }
 
+#landing,
 #dropzone {
   position: absolute;
-  top: 10px;
-  bottom: 10px;
-  left: 10px;
-  right: 10px;
-  border-radius: 10px;
-  border: 2px dashed #ccc;
-  padding-top: 20vh;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+#landing {
+  font-family: 'HelveticaNeue-Light', 'Helvetica Neue Light', 'Helvetica Neue', Arial, Helvetica, sans-serif;
+  padding-top: 10vh;
+
+  header {
+    h1 {
+      font-size: 3.5em;
+      margin-bottom: 0;
+    }
+
+    p {
+      font-size: 2em;
+      color: $gray-light;
+    }
+  }
 
   &.dragging {
     border-color: $brand-success;
   }
 
-  ~ .progess {
+  ~ .progress {
     display: none;
   }
+}
 
-  ~ .github-ribbon {
+.instructions {
+  margin-top: 320px;
+  margin-bottom: 50px;
+  font-size: 1.5em;
+  line-height: 1.6;
+
+  span {
     display: block;
   }
+
+  .lib-path {
+    word-break: break-all;
+  }
+}
+
+.drop-ring, .drop-icon {
+  width: 260px;
+  height: 260px;
+  margin-top: 20px;
+  position: absolute;
+  left: 50%;
+  margin-left: -130px;
+}
+
+.drop-ring {
+  border: 2px dashed lighten($brand-primary, 30%);
+  border-radius: 50%;
+  -webkit-transition: width 0.5s, height 0.5s, margin 0.5s;
+  -moz-transition:    width 0.5s, height 0.5s, margin 0.5s;
+  transition:         width 0.5s, height 0.5s, margin 0.5s;
+}
+
+#landing.dragging .drop-ring {
+  border-color: $brand-success;
+  width: 270px;
+  height: 270px;
+  margin-left: -135px;
+  margin-top: 15px;
+
+  -webkit-animation: spin 20s linear infinite;
+  -moz-animation:    spin 20s linear infinite;
+  animation:         spin 20s linear infinite;
+}
+
+@-moz-keyframes    spin { 100% { -moz-transform: rotate(360deg); } }
+@-webkit-keyframes spin { 100% { -webkit-transform: rotate(360deg); } }
+@keyframes         spin { 100% { -webkit-transform: rotate(360deg); transform:rotate(360deg); } }
+
+.drop-icon {
+  img {
+    margin-top: 4%;
+    height: 85%;
+  }
+}
+
+.drop-ring {
+  position: absolute;
+}
+
+.about {
+  color: $gray-light;
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  text-align: center;
+  padding: 1em;
+  background-color: white;
 }

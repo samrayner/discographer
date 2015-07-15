@@ -137,6 +137,14 @@ class App.Main
 
   start: =>
     $("#output").html("")
+    $dropzone = $("#dropzone")
+    $dropzone.toggleClass("ready dragging")
+
+    dropzone = $dropzone.get(0)
+    dropzone.removeEventListener "dragenter", @dragEnter
+    dropzone.removeEventListener "dragleave", @dragLeave
+    dropzone.removeEventListener "drop",      @drop
+    dropzone.removeEventListener "dragover",  @killEvent
 
   stop: ->
     $(".progress").addClass("done")
@@ -146,18 +154,38 @@ class App.Main
     width = "#{Math.ceil(done/total*100)}%"
     $(".progress-bar").css("width", width)
 
-  init: ->
-    $("#file-input").change (event) =>
-      unless window.File && window.FileList && window.FileReader
-        return window.alert("Your browser does not support the File API")
+  killEvent: (event) ->
+    event.stopPropagation()
+    event.preventDefault()
 
-      files = event.target.files
-      if files.length == 1 && files[0].type.match("text/xml")
-        parser = new App.LibParser(files[0], @processTrack, @updateProgress, @stop)
-        @start()
-        parser.read()
-      else
-        window.alert("Please drop your iTunes Music Library.xml")
+  dragEnter: (event) =>
+    @killEvent(event)
+    $("#dropzone").addClass("dragging")
+
+  dragLeave: (event) =>
+    @killEvent(event)
+    $("#dropzone").removeClass("dragging")
+
+  drop: (event) =>
+    @killEvent(event)
+
+    unless window.File && window.FileList && window.FileReader
+      return window.alert("Your browser does not support the File API")
+
+    files = event.dataTransfer.files
+    if files.length == 1 && files[0].type.match("text/xml") && files[0].name.match(/^iTunes (Music )?Library/) != null
+      parser = new App.LibParser(files[0], @processTrack, @updateProgress, @stop)
+      @start()
+      parser.read()
+    else
+      window.alert("Please drop your iTunes Music Library.xml")
+
+  init: ->
+    dropzone = $("#dropzone").get(0)
+    dropzone.addEventListener "dragenter", @dragEnter
+    dropzone.addEventListener "dragleave", @dragLeave
+    dropzone.addEventListener "drop",      @drop
+    dropzone.addEventListener "dragover",  @killEvent
 
 $ ->
   app = new App.Main("<%= spotify_token %>", "<%= spotify_market %>")

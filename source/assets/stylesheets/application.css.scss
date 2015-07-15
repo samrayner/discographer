@@ -24,3 +24,23 @@
     height: 0;
   }
 }
+
+
+#dropzone.ready {
+  position: absolute;
+  top: 10px;
+  bottom: 10px;
+  left: 10px;
+  right: 10px;
+  border-radius: 10px;
+  border: 2px dashed #ccc;
+  padding-top: 20vh;
+
+  &.dragging {
+    border-color: $brand-success;
+  }
+
+  .progress {
+    display: none;
+  }
+}

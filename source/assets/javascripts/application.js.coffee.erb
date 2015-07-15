@@ -8,6 +8,7 @@ class App.Main
   @API_ROOT: "https://api.spotify.com/v1"
   market: "US"
   library: {}
+  artists: []
   headers: {}
 
   constructor: (token, @market) ->
@@ -20,19 +21,32 @@ class App.Main
     artistNorm = @normalize(artist)
     albumNorm = @normalize(album)
     if @library[artistNorm] == undefined
-      @renderArtist(artist, artistNorm)
+      index = @insertArtist(artist)
+      @renderArtist(artist, artistNorm, index)
       @library[artistNorm] = [albumNorm]
     else if @library[artistNorm].indexOf(albumNorm) == -1
       @library[artistNorm].push(albumNorm)
 
-  renderArtist: (artist, artistNorm) ->
-    $col = $("<div class='col-sm-6' />")
+  insertArtist: (artist) ->
+    artist = artist.replace(/^the /i, "")
+    @artists.push(artist)
+    @artists.sort()
+    @artists.indexOf(artist)
+
+  renderArtist: (artist, artistNorm, index) ->
+    $col = $("<div class='col-sm-6 panel-wrapper' />")
     $panel = $("<div class='panel panel-default' data-artist='#{artistNorm}' />")
     $heading = $("<div class='panel-heading'><strong>#{artist}<strong><span class='glyphicon glyphicon-chevron-down pull-right'></span></div>")
     $heading.click => @headingClick(artistNorm)
     $panel.append($heading)
     $col.append($panel)
-    $("#output").append($col)
+
+    if @artists.length == 0
+      $("#output").append($col)
+    else if index == 0
+      $("#output").prepend($col)
+    else
+      $("#output .panel-wrapper").eq(index-1).after($col)
 
   toggleArrow: ($heading) ->
     $heading.find(".glyphicon").toggleClass("glyphicon-chevron-down glyphicon-chevron-up")

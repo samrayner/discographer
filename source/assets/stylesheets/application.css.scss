@@ -3,6 +3,11 @@
 
 .panel-heading {
   cursor: pointer;
+
+  .glyphicon {
+    color: #bbb;
+    text-shadow: 0 1px 0 white;
+  }
 }
 
 .progress {

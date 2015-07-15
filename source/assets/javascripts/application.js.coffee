@@ -9,10 +9,17 @@ class App.Main
   market: "US"
   library: {}
   artists: []
-  headers: {}
 
-  constructor: (token, @market) ->
-    @headers["Authorization"] = "Bearer #{token}" if token.length >= 1
+  constructor: ->
+    if typeof geoip2 != 'undefined'
+      geoip2.country @geoSuccess, null
+
+    if window.navigator.platform.match(/mac/i) == null
+      $path = $(".lib-path")
+      $path.text($path.text().replace(/\//g, "\\"))
+
+  geoSuccess: (location) =>
+    @market = location.country.iso_code
 
   normalize: (string) ->
     string.toLowerCase().replace("&", "and").replace(/[^A-zÀ-ÿ\s]/g, "").replace(/\s+/g, " ").trim()
@@ -61,10 +68,7 @@ class App.Main
 
   getArtist: (name) =>
     url = "#{App.Main.API_ROOT}/search/?q=artist:#{encodeURIComponent(name)}&type=artist&limit=1&market=#{@market}"
-    $ajax = $.ajax
-      url: url,
-      headers: @headers
-    $ajax.done (data) =>
+    $.getJSON url, (data) =>
       artist = data.artists.items[0]
       if artist == undefined
         @renderError(name)
@@ -73,10 +77,7 @@ class App.Main
 
   getAlbumsForArtist: (id, name, apiName) ->
     url = "#{App.Main.API_ROOT}/artists/#{id}/albums?album_type=album&market=#{@market}"
-    $ajax = $.ajax
-      url: url
-      headers: @headers
-    $ajax.done (data) =>
+    $.getJSON url, (data) =>
       names = []
       ids = []
       $.each data.items, (_, album) =>
@@ -92,10 +93,7 @@ class App.Main
 
   getAlbums: (ids, artist, apiArtist) =>
     url = "#{App.Main.API_ROOT}/albums?ids=#{ids.join(',')}"
-    $ajax = $.ajax
-      url: url,
-      headers: @headers
-    $ajax.done (data) =>
+    $.getJSON url, (data) =>
       albums = data.albums.sort (a, b) =>
         @timestamp(a.release_date) - @timestamp(b.release_date)
       @renderAlbums(albums, artist, apiArtist)
@@ -136,15 +134,7 @@ class App.Main
     (new Date(string)).valueOf()
 
   start: =>
-    $("#output").html("")
-    $dropzone = $("#dropzone")
-    $dropzone.toggleClass("ready dragging")
-
-    dropzone = $dropzone.get(0)
-    dropzone.removeEventListener "dragenter", @dragEnter
-    dropzone.removeEventListener "dragleave", @dragLeave
-    dropzone.removeEventListener "drop",      @drop
-    dropzone.removeEventListener "dragover",  @killEvent
+    $("#dropzone").remove()
 
   stop: ->
     $(".progress").addClass("done")
@@ -188,5 +178,5 @@ class App.Main
     dropzone.addEventListener "dragover",  @killEvent
 
 $ ->
-  app = new App.Main("<%= spotify_token %>", "<%= spotify_market %>")
+  app = new App.Main()
   app.init()

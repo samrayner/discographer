@@ -5,4 +5,3 @@ source 'http://rubygems.org'
 gem "middleman"
 gem "middleman-deploy"
 gem 'bootstrap-sass', require: false
-gem 'rspotify'

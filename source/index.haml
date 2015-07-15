@@ -2,27 +2,39 @@
 %html{ lang: "en-gb" }
   %head
     %meta{ charset: "utf-8" }
-    %meta{ name: "viewport", content: "initial-scale=1.0, width=device-width" }
+    %link{ rel: "dns-prefetch", href: "//ajax.googleapis.com" }
+    %meta{ name: "viewport", content: "width=device-width" }
     %meta{ name: "apple-mobile-web-app-capable", content: "yes" }
+    %meta{ "http-equiv" => "X-UA-Compatible", content: "IE=edge,chrome=1" }
     %title Discographer
 
     = stylesheet_link_tag "application"
+
+    = javascript_include_tag "//js.maxmind.com/js/apis/geoip2/v2.1/geoip2.js"
     = javascript_include_tag "application"
   %body
-    #dropzone.ready
-      .progress
-        .progress-bar#progress
+    #dropzone
       .container
-        .row#output
-          .col-sm-10.col-sm-offset-1
-            .jumbotron.text-center
-              %h1 Discographer
+        .row
+          .col-xs-12.text-center
+            %h1
+              Discographer
+              .small Discover more albums by the artists you love.
+
+            %p Drag your iTunes library file here.
+
+            %p
+              You can find it at:
+              %code.lib-path /Users/USERNAME/Music/iTunes/iTunes Library.xml
+
+            .about
               :markdown
-                Discographer lists the back catalogues of artists in your iTunes library and highlights the ones you own.
+                Discographer searches the [Spotify API](https://developer.spotify.com/web-api/) for artists in your library and lists their albums.
 
-                Never miss an album by your favourite band!
+    = link_to "https://github.com/samrayner/discographer", class: "github-ribbon" do
+      = image_tag "https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67", alt: "Fork me on Github"
 
-            :markdown
-              Discographer assumes your library is managed by iTunes, with albums sorted into folders by artist at `~/Music/iTunes/iTunes Media/Music`.
-
-              Albums are fetched through the [Spotify API](https://developer.spotify.com/web-api/). Add a `data/config.yml` based on the example to specify a country code for album availability (defaults to `US`). You can optionally supply [Spotify API credentials](https://developer.spotify.com/my-applications/) to improve speed.
+    .progress
+      .progress-bar#progress
+    .container
+      .row#output

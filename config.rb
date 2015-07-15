@@ -16,3 +16,4 @@ activate :deploy do |deploy|
 end
 
 activate :directory_indexes
+activate :relative_assets

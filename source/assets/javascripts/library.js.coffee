@@ -10,10 +10,11 @@ class App.LibParser
   constructor: (@file, @newTrack, @progress=null, @done=null) ->
     @fileReader.addEventListener "load", (event) =>
       xml = event.target.result
-      if xml.indexOf("<key>Size</key>") != -1
-        if xml.indexOf(@delimiter) == 0
-          xml = "<dict>#{xml.split("</dict>", 1)[0]}</dict>"
-          @parseTrack(xml)
+      if xml.indexOf(@delimiter) == 0
+        xml = "<dict>#{xml.split("</dict>", 1)[0]}</dict>"
+        @parseTrack(xml)
+
+      if xml.indexOf("<key>Playlists</key>") == -1
         @offset += xml.indexOf(@delimiter, 1)
         @read()
       else

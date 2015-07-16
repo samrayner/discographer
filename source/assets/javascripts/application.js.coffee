@@ -11,9 +11,6 @@ class App.Main
   artists: []
 
   constructor: ->
-    if typeof geoip2 != 'undefined'
-      geoip2.country @geoSuccess, null
-
     if window.navigator.platform.match(/mac/i) == null
       $path = $(".lib-path")
       $path.text($path.text().replace(/\//g, "\\"))
@@ -134,6 +131,8 @@ class App.Main
     (new Date(string)).valueOf()
 
   start: =>
+    $.getJSON "http://ipinfo.io", (response) =>
+      @market = response.country
     $("#landing").remove()
 
   stop: ->
@@ -157,7 +156,7 @@ class App.Main
     $("#landing").removeClass("dragging")
 
   drop: (event) =>
-    @killEvent(event)
+    @dragLeave(event)
 
     unless window.File && window.FileList && window.FileReader
       return window.alert("Your browser does not support the File API")
@@ -168,7 +167,7 @@ class App.Main
       @start()
       parser.read()
     else
-      window.alert("Please drop your iTunes Library.xml")
+      window.alert("Drag your iTunes library here from\n/Users/USERNAME/Music/iTunes/iTunes Library.xml")
 
   init: ->
     dropzone = $("#dropzone").get(0)

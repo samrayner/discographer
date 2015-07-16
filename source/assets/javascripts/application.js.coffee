@@ -73,7 +73,7 @@ class App.Main
         @getAlbumsForArtist(artist.id, name, artist.name)
 
   getAlbumsForArtist: (id, name, apiName) ->
-    url = "#{App.Main.API_ROOT}/artists/#{id}/albums?album_type=album&market=#{@market}"
+    url = "#{App.Main.API_ROOT}/artists/#{id}/albums?album_type=album&market=#{@market}&limit=27"
     $.getJSON url, (data) =>
       names = []
       ids = []

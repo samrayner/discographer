@@ -47,6 +47,8 @@ class App.LibParser
     bitRate = @valueForKeyInDoc("bit rate", doc)
     isAudioBook = @valueForKeyInDoc("genre", doc) == "Audiobook"
 
+    artist = undefined if artist == "Various Artists"
+
     if !isAudioBook && [artist, album, bitRate].indexOf(undefined) == -1
       @newTrack(artist, album)
 

@@ -38,19 +38,17 @@ class App.Main
     @artists.indexOf(artist)
 
   renderArtist: (artist, artistNorm, index) ->
-    $col = $("<div class='col-sm-6 panel-wrapper' />")
     $panel = $("<div class='panel panel-default' data-artist='#{artistNorm}' />")
-    $heading = $("<div class='panel-heading'><strong>#{artist}<strong><span class='glyphicon glyphicon-chevron-down pull-right'></span></div>")
+    $heading = $("<div class='panel-heading'><strong>#{artist}<strong><span class='glyphicon glyphicon-chevron-down'></span></div>")
     $heading.click => @headingClick(artistNorm)
     $panel.append($heading)
-    $col.append($panel)
 
     if @artists.length == 0
-      $("#output").append($col)
+      $("#output").append($panel)
     else if index == 0
-      $("#output").prepend($col)
+      $("#output").prepend($panel)
     else
-      $("#output .panel-wrapper").eq(index-1).after($col)
+      $("#output .panel").eq(index-1).after($panel)
 
   toggleArrow: ($heading) ->
     $heading.find(".glyphicon").toggleClass("glyphicon-chevron-down glyphicon-chevron-up")
@@ -73,7 +71,7 @@ class App.Main
         @getAlbumsForArtist(artist.id, name, artist.name)
 
   getAlbumsForArtist: (id, name, apiName) ->
-    url = "#{App.Main.API_ROOT}/artists/#{id}/albums?album_type=album&market=#{@market}&limit=27"
+    url = "#{App.Main.API_ROOT}/artists/#{id}/albums?album_type=album&market=#{@market}"
     $.getJSON url, (data) =>
       names = []
       ids = []
@@ -138,6 +136,7 @@ class App.Main
   stop: ->
     $(".progress").addClass("done")
     setTimeout (-> $(".progress").addClass("collapsed")), 1000
+    $("#output").append("<div class='end-pad' />")
 
   updateProgress: (done, total) ->
     width = "#{Math.ceil(done/total*100)}%"

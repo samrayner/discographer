@@ -3,8 +3,18 @@
 
 .panel-heading {
   cursor: pointer;
+  position: relative;
+
+  strong {
+    display: inline-block;
+    max-width: 90%;
+  }
 
   .glyphicon {
+    position: absolute;
+    top: 50%;
+    margin-top: -8px;
+    right: 10px;
     color: #bbb;
     text-shadow: 0 1px 0 white;
   }
@@ -33,7 +43,27 @@
 }
 
 #output {
-  padding: 40px;
+  float: left;
+  padding: 2vh 40px;
+  height: 96vh;
+
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+
+  display: -webkit-flex;
+  -webkit-flex-direction: column;
+  -webkit-flex-wrap: wrap;
+
+  .panel {
+    width: 300px;
+    margin-right: 20px;
+  }
+
+  .end-pad {
+    width: 40px;
+    height: 100vh;
+  }
 }
 
 .list-group-item-success {

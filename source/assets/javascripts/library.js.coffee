@@ -31,7 +31,8 @@ class App.LibParser
   valueForKeyInDoc: (key, doc) ->
     $key = $(doc).find("key").filter(-> $(this).text().toLowerCase() == key.toLowerCase())
     if $key.length >= 1
-      $key.next().text()
+      value = $key.next().text().trim()
+      if value.length == 0 then undefined else value
     else
       undefined
 

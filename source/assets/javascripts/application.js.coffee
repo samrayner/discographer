@@ -19,7 +19,7 @@ class App.Main
     @market = location.country.iso_code
 
   normalize: (string) ->
-    string.toLowerCase().replace("&", "and").replace(/[^A-zÀ-ÿ\s]/g, "").replace(/\s+/g, " ").trim()
+    string.toLowerCase().replace("&", "and").replace(/[^A-zÀ-ÿ\d\s]/g, "").replace(/\s+/g, " ").trim()
 
   processTrack: (artist, album) =>
     artistNorm = @normalize(artist)

@@ -56,10 +56,10 @@ class App.Main
     $heading.find(".glyphicon").toggleClass("glyphicon-chevron-down glyphicon-chevron-up")
 
   headingClick: (artist) =>
-    $target = $(event.target)
+    $target = $(event.currentTarget)
     @getArtist(artist)
     @toggleArrow($target)
-    $target.unbind("click").click =>
+    $target.off("click").click =>
       @toggleArrow($target)
       $target.parent().find(".list-group").toggleClass("hidden")
 
@@ -125,7 +125,7 @@ class App.Main
       $item.addClass("list-group-item-success") if match
       $group.append($item)
 
-    $(".panel[data-artist='#{artist}']").append($group)
+    $panel = $(".panel[data-artist='#{artist}']").append($group)
 
   timestamp: (string) ->
     (new Date(string)).valueOf()

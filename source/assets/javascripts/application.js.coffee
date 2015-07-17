@@ -169,7 +169,7 @@ class App.Main
       @start()
       parser.read()
     else
-      window.alert("Drag your iTunes library here from\n/Users/USERNAME/Music/iTunes/iTunes Library.xml")
+      window.alert("Drag your iTunes library here from\n/Users/USERNAME/Music/iTunes/iTunes Music Library.xml")
 
   init: ->
     dropzone = $("#dropzone").get(0)

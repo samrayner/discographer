@@ -77,7 +77,6 @@ class App.Main
       ids = []
       $.each data.items, (_, album) =>
         norm = @normalize(album.name)
-        return if album.name.toLowerCase().match(/\((deluxe|special)/) != null
         return if names.indexOf(norm) != -1
         ids.push(album.id)
         names.push(norm)

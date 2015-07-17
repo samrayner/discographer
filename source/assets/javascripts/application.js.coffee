@@ -110,17 +110,20 @@ class App.Main
 
     for album in albums
       $item = $("<a target='_blank' class='list-group-item' href='#{album.external_urls.spotify}' />")
-      $art = $("<img class='pull-right' src='#{album.images[0].url}' height='30' />")
+      $art = $("<img class='album-art' src='#{album.images[0].url}' height='30' width='30' />")
 
       year = album.release_date.replace(/^(\d{4}).*/, '$1')
-      $body = $("<p><span class='album-year'>#{year}</span>: #{album.name}</p>")
+      $body = $("<p class='album-body'><span class='album-year'>#{year}</span>: #{album.name}</p>")
 
       if year == "#{new Date().getFullYear()}"
         $body.append(" <span class='label label-info'>New</span>")
 
       $item.append($art, $body)
       match = @library[artist].indexOf(@normalize(album.name)) != -1
-      $item.addClass("list-group-item-success") if match
+      if match
+        $item
+          .addClass("list-group-item-success")
+          .append("<span class='glyphicon glyphicon-ok' />")
       $group.append($item)
 
     $panel = $(".panel[data-artist='#{artist}']").append($group)

@@ -1,25 +1,6 @@
 @import "bootstrap-sprockets";
 @import "bootstrap";
 
-.panel-heading {
-  cursor: pointer;
-  position: relative;
-
-  strong {
-    display: inline-block;
-    max-width: 90%;
-  }
-
-  .glyphicon {
-    position: absolute;
-    top: 50%;
-    margin-top: -8px;
-    right: 10px;
-    color: #bbb;
-    text-shadow: 0 1px 0 white;
-  }
-}
-
 .progress {
   border-radius: 0;
   height: 10px;
@@ -54,20 +35,65 @@
   display: -webkit-flex;
   -webkit-flex-direction: column;
   -webkit-flex-wrap: wrap;
+}
 
-  .panel {
-    width: 300px;
-    margin-right: 20px;
-  }
+.panel {
+  width: 300px;
+  margin-right: 20px;
 
-  .end-pad {
-    width: 40px;
-    height: 100vh;
+  .glyphicon {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    margin-top: -8px;
   }
 }
 
+.panel-heading {
+  cursor: pointer;
+  position: relative;
+
+  strong {
+    display: inline-block;
+    max-width: 90%;
+  }
+
+  .glyphicon {
+    color: #bbb;
+    text-shadow: 0 1px 0 white;
+  }
+}
+
+.end-pad {
+  width: 40px;
+  height: 96vh;
+}
+
+.list-group-item {
+  @include clearfix;
+}
+
+.album-art, .album-body {
+  float: left;
+}
+
+.album-body {
+  font-size: 0.95em;
+  width: 225px;
+  margin: 0 0 0 10px;
+}
+
 .list-group-item-success {
-  text-decoration: line-through;
+  .album-body {
+    width: 205px;
+  }
+
+  .glyphicon {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    margin-top: -8px;
+  }
 }
 
 .album-year {

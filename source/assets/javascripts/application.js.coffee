@@ -40,7 +40,7 @@ class App.Main
   renderArtist: (artist, artistNorm, index) ->
     $panel = $("<div class='panel panel-default' data-artist='#{artistNorm}' />")
     $heading = $("<div class='panel-heading'><strong>#{artist}<strong><span class='glyphicon glyphicon-chevron-down'></span></div>")
-    $heading.click => @headingClick(artistNorm)
+    $heading.click (event) => @headingClick(event, artistNorm)
     $panel.append($heading)
 
     if @artists.length == 0
@@ -53,7 +53,7 @@ class App.Main
   toggleArrow: ($heading) ->
     $heading.find(".glyphicon").toggleClass("glyphicon-chevron-down glyphicon-chevron-up")
 
-  headingClick: (artist) =>
+  headingClick: (event, artist) =>
     $target = $(event.currentTarget)
     @getArtist(artist)
     @toggleArrow($target)

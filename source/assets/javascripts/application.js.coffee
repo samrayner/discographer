@@ -62,12 +62,17 @@ class App.Main
       $target.parent().find(".list-group").toggleClass("hidden")
 
   getArtist: (name) =>
-    url = "#{App.Main.API_ROOT}/search/?q=artist:#{encodeURIComponent(name)}&type=artist&limit=1&market=#{@market}"
+    url = "#{App.Main.API_ROOT}/search/?q=artist:#{encodeURIComponent(name)}&type=artist&market=#{@market}"
     $.getJSON url, (data) =>
-      artist = data.artists.items[0]
-      if artist == undefined
+      artists = data.artists.items
+      if artists.length == 0
         @renderError(name)
       else
+        artist = artists[0]
+        for art in artists
+          if @normalize(art.name) == name
+            artist = art
+            break
         @getAlbumsForArtist(artist.id, name, artist.name)
 
   getAlbumsForArtist: (id, name, apiName) ->

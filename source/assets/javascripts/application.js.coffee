@@ -34,7 +34,8 @@ class App.Main
   insertArtist: (artist) ->
     artist = artist.replace(/^the /i, "")
     @artists.push(artist)
-    @artists.sort()
+    @artists.sort (a, b) ->
+      a.localeCompare(b, 'en', { sensitivity: 'base' })
     @artists.indexOf(artist)
 
   renderArtist: (artist, artistNorm, index) ->

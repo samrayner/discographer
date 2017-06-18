@@ -2,6 +2,6 @@
 # the following line to use "https"
 source 'http://rubygems.org'
 
-gem "middleman"
+gem "middleman", "~> 3.4.1"
 gem "middleman-deploy"
 gem 'bootstrap-sass', require: false

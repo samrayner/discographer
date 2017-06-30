@@ -6,9 +6,11 @@ window.App ||= {}
 
 class App.Main
   @API_ROOT: "https://api.spotify.com/v1"
+  @AUTH_URL: "https://sr-spotify-auth.herokuapp.com"
   market: "US"
   library: {}
   artists: []
+  authHeader: ""
 
   constructor: ->
     if window.navigator.platform.match(/mac/i) == null
@@ -62,9 +64,22 @@ class App.Main
       @toggleArrow($target)
       $target.parent().find(".list-group").toggleClass("hidden")
 
+  getAccessToken: ->
+    $ajax = $.ajax
+      dataType: "text"
+      type: "post"
+      url: App.Main.AUTH_URL
+    $ajax.done (data) =>
+      @authHeader = "Bearer #{data}"
+
   getArtist: (name) =>
     url = "#{App.Main.API_ROOT}/search/?q=artist:#{encodeURIComponent(name)}&type=artist&market=#{@market}"
-    $.getJSON url, (data) =>
+    $ajax = $.ajax
+      dataType: "json"
+      url: url
+      headers:
+        Authorization: @authHeader
+    $ajax.done (data) =>
       artists = data.artists.items
       if artists.length == 0
         @renderError(name)
@@ -78,7 +93,12 @@ class App.Main
 
   getAlbumsForArtist: (id, name, apiName) ->
     url = "#{App.Main.API_ROOT}/artists/#{id}/albums?album_type=album&market=#{@market}"
-    $.getJSON url, (data) =>
+    $ajax = $.ajax
+      dataType: "json"
+      url: url
+      headers:
+        Authorization: @authHeader
+    $ajax.done (data) =>
       names = []
       ids = []
       $.each data.items, (_, album) =>
@@ -93,7 +113,12 @@ class App.Main
 
   getAlbums: (ids, artist, apiArtist) =>
     url = "#{App.Main.API_ROOT}/albums?ids=#{ids.join(',')}"
-    $.getJSON url, (data) =>
+    $ajax = $.ajax
+      dataType: "json"
+      url: url
+      headers:
+        Authorization: @authHeader
+    $ajax.done (data) =>
       albums = data.albums.sort (a, b) =>
         @timestamp(a.release_date) - @timestamp(b.release_date)
       @renderAlbums(albums, artist, apiArtist)
@@ -177,6 +202,7 @@ class App.Main
       window.alert("Drag your iTunes library here from\n/Users/USERNAME/Music/iTunes/iTunes Music Library.xml")
 
   init: ->
+    @getAccessToken()
     dropzone = $("#dropzone").get(0)
     dropzone.addEventListener "dragenter", @dragEnter
     dropzone.addEventListener "dragleave", @dragLeave
